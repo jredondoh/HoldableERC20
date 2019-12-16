@@ -62,11 +62,17 @@ No database or encryption have been implemented for this task, just a plain text
 
 For bets, only 4 simultaneous instances have been made available but it is not acceptable for scalability issues. A possible solution is to have several instances of bets running in parallel and assign an oncoming bet to a random instance instead of only one as it is in this proof-of-concept.
 
-To start the server, from the ./backend folder: 
+To start the server, from the root folder: 
 
 `yarn install` 
 
-`ganache-cli -p 7545` 
+`ganache-cli -p 7545`
+
+`truffle migrate`
+
+Contract address is added to ./backend/AppHoldableERC20/contractData.py
+
+And in the ./backend folder: 
 
 `python3.6 manage.py runserver` 
 
