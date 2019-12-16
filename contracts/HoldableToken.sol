@@ -1,18 +1,26 @@
 pragma solidity ^0.5.8;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+/**
+ * @file: HoldableToken.sol
+ * @author: Jose Redondo Hurtado
+ * @brief: Implementation of a Holdable ERC-20 token based on OpenZeppelin ERC-20 implementation.
+ */
 
 /** 
  * Code based in Openzeppelin implementation of ERC20.
  */
 
 /** 
- * It's not needed these imports as HoldableERC20 extends ERC20 that already
+ * These imports are not needed as HoldableERC20 extends ERC20 that already
  * includes those imports.
  */
 /* import "../../GSN/Context.sol"; */
 /* import "./IERC20.sol"; */
 /* import "../../math/SafeMath.sol"; */
 
+/**
+ * OpenZeppelin implementation code header.
+ */
 /**
  * @dev Implementation of the {IERC20} interface.
  *
@@ -59,23 +67,51 @@ contract HoldableERC20 is ERC20 {
     uint public INITIAL_SUPPLY = 12000;
 
 
+    /**
+     * @dev Constructor mints all total supply of tokens and assign it to the contract owner.
+     */    
     constructor() public {
       _mint(msg.sender, INITIAL_SUPPLY);
     }
 
+    /**
+     * @dev Update of balanceOf function to include funds on hold.
+     */    
     function balanceOf(address account) public view returns (uint256) {
       return _balances[account] + _holdBalances[account];
     }
 
+    /**
+     * @dev Calls to internal _hold function to generates a hold action that would moves tokens 
+     * `amount` from `sender` to `recipient` if it is approved or the allowance is superior to
+     * `amount`.
+     */    
     function holdFrom(address sender, address recipient, uint256 amount, uint256 holdId) public returns (bool) {
         _hold(sender, recipient, amount, holdId);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
     }
+    /**
+     * @dev Calls to internal _hold function to generates a hold action that would moves tokens 
+     * `amount` from `sender` to `recipient`.
+     */
     function hold(address recipient, uint256 amount, uint256 holdId) public returns (bool) {
         _hold(_msgSender(), recipient, amount, holdId);
         return true;
     }
+
+    /**
+     * @dev Generates a hold action that would moves tokens `amount` from `sender` to `recipient`.
+     *
+     * This is a internal function.
+     *
+     * Requirements:
+     *
+     * - `sender` cannot be the zero address.
+     * - `recipient` cannot be the zero address.
+     * - `sender` must have a balance of at least `amount`.
+     * - `holdId` must not be used before to generate a hold.
+     */
     function _hold(address sender, address recipient, uint256 amount, uint256 holdId) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
@@ -88,6 +124,17 @@ contract HoldableERC20 is ERC20 {
         _holdData[holdId] = holdStruct({from:sender,to:recipient,amount:amount});
         /* No event is emitted as no transfer between users has been performed */
     }
+
+    /**
+     * @dev Executes hold action and transfers from the sender to the recipient.
+     *
+     * Emits a {Transfer} event.
+     *
+     * Requirements:
+     *
+     * - `holdId` must be a valid Hold identifier.
+     * - `holdId` must not be executed before.
+     */
     function executeHold(uint256 holdId) public returns (bool){
       /* It is required that holdId points to a valid hold */
         require(_holdData[holdId].from != address(0), "HoldableERC20: invalid holdId");
@@ -103,9 +150,19 @@ contract HoldableERC20 is ERC20 {
         /* "Clean" hold Id data, to avoid repeated calls */
         _holdData[holdId].to = address(0);
     }
+
+    /**
+     * @dev Removes the hold and transfers the funds on hold to the user balance so it is available
+     * again for transfers.
+     *
+     * Requirements:
+     *
+     * - `holdId` must be a valid Hold identifier.
+     */
     function removeHold(uint256 holdId) public returns (bool){
         require(_holdData[holdId].from != address(0), "HoldableERC20: invalid holdId");
-
+	
+	/* Unreachable error code but kept in case of fatal error. */
         _holdBalances[_holdData[holdId].from] = _holdBalances[_holdData[holdId].from].sub(
             _holdBalances[_holdData[holdId].from],
             "HoldableERC20: fatal error in hold balances algorithm");
@@ -114,6 +171,10 @@ contract HoldableERC20 is ERC20 {
         /* "Clean" hold Id data, to avoid repeated calls */
         _holdData[holdId].to = address(0);
     }
+    /**
+     * From here on, Open-Zeppenlin code has not been modified.
+     */
+
     /**
      * @dev See {IERC20-totalSupply}.
      */

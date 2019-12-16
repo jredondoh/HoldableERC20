@@ -87,8 +87,12 @@ In folder ./backend/tests/
 Test correctness must be ensured via output tests inspection for timing constraints. It would be easy to use a testing tool to generate input and check the backend output.
 
 ## Overall thoughts ##
-I have tried to follow style guidelines for both Solidity, JavaScript and Python code (PEP8 in this case) but it has not been enforced for timing constraints.
+I have tried to follow style guidelines for both Solidity, JavaScript and Python code (PEP8 in this case) but it has not been enforced for timing constraints. 
+
 Doxygen style comments have been provided in order to make the documentation generation as automatic as possible.
+
+In Solidity, OpenZeppelin SafeMath library is used in order to ensure mathematical operations are secure.
+
 
 ## Improvements ##
 Implement database service for storing users and bets information
