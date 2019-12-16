@@ -165,4 +165,27 @@ contract("HoldableERC20", accounts => {
                 "Expected an error as hold Id already executed.");
         }
     });
+    it("Not sufficient funds for holds.", async () => {
+        const holdId = 4;
+        const amount = 500;
+        const from = accounts[1];
+        const to = accounts[0];
+        const initialFrom = TOTAL_SUPPLY;
+        const initialTo = 0;
+        let expectedMsg = "ERC20: transfer amount exceeds balance";
+        try{
+            let tx = await instance.hold(to, TOTAL_SUPPLY, holdId,{from:from});
+        } catch (e) {
+            assert(e.message.includes(expectedMsg),
+                "Expected an error as hold Id used is not valid.");
+        }
+        tx = await instance.increaseAllowance(
+            to, TOTAL_SUPPLY,{from: from});
+        try{
+            tx = await instance.holdFrom(from, to, TOTAL_SUPPLY, holdId);
+        } catch (e) {
+            assert(e.message.includes(expectedMsg),
+                "Expected an error as hold Id used is not valid.");
+        }
+    });
 });
