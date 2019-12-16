@@ -58,6 +58,12 @@ For the backend, I have chosen Python as programming language and Django as fram
 
 The input body is a JSON structure with only an “addr” field with the address in hex.
 
+The betting mechanism is as is:
+- When a bet is placed, a hold from the bettor to the contract owner is created
+- When the bet is resolved, if winner the hold id is removed (so we save a transaction)
+- If loser, the hold is executed, the funds transfer to the contract owner and transferred to the bet winner.
+
+
 No database or encryption have been implemented for this task, just a plain text file, and no shared resource control. 
 
 For bets, only 4 simultaneous instances have been made available but it is not acceptable for scalability issues. A possible solution is to have several instances of bets running in parallel and assign an oncoming bet to a random instance instead of only one as it is in this proof-of-concept.

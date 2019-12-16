@@ -13,6 +13,10 @@ from web3 import Web3, HTTPProvider
 
 from AppHoldableERC2O import contractData
 from AppHoldableERC2O import log
+##  
+#  @file: status.py
+#  @author: Jose Redondo Hurtado
+#  @brief: status service for Holdable ERC-20 token betting system.
 
 @api_view(["POST"])
 def UserStatus(data):

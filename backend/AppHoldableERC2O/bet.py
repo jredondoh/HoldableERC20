@@ -13,6 +13,11 @@ from web3 import Web3, HTTPProvider
 
 from AppHoldableERC2O import contractData
 from AppHoldableERC2O import log
+##  
+#  @file: bet.py
+#  @author: Jose Redondo Hurtado
+#  @brief: bet service for Holdable ERC-20 token betting system.
+
 
 @api_view(["POST"])
 def PlaceBet(data):
@@ -54,14 +59,16 @@ def PlaceBet(data):
             bet_status = _log.ManageBets()
             if bet_status['status']:
                 for loser_id in bet_status['losers']:
+                    # executes holds for losers
                     tx_hash = contract.functions.executeHold(loser_id).\
                               transact({'from': w3.eth.accounts[0]})
                     tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-
+                # removes hold for winner
                 tx_hash = contract.functions.removeHold(
                     bet_status['winner_id']).\
                     transact({'from': w3.eth.accounts[0]})
                 tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
+                # transfers corresponding funds to winner
                 tx_hash = contract.functions.transfer(
                     bet_status['winner_addr'],
                     bet_status['mulx']*FIXED_BET).\
